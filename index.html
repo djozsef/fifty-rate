@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <base target="_top">
+      <link href="https://fonts.googleapis.com/css?family=Roboto&amp;subset=latin-ext" rel="stylesheet">
+      <style type="text/css">
+         html {
+             font-family: "Roboto","Helvetica","Arial",sans-serif;
+             color:white;
+             background-color:#21212d;          
+         }
+         .display{
+             background:url(https://i.scdn.co/image/dd031b9c5d1b6eba4a691cd89c954255aae787f2) no-repeat center center transparent;
+             background-size:100%;
+             box-shadow: 0 0 100px #000;
+             width:500px;   
+             min-height:517px;
+             margin: 100px auto 0 auto;
+             border-radius: 8px;
+             cursor:pointer;
+         }
+         .display span{
+             display: block;
+             text-align: center;
+             font-size: 46px;
+             font-weight: 700;
+             top: -70px;
+             position: relative;
+             text-shadow: 2px 2px 1px #000000;
+         }
+         .display span::after{
+             font-size: 20px;
+             vertical-align: middle;
+             margin-left: 10px;
+         }
+         .display span.up::after{
+		     content:'\25B2';
+             color:#7fff00;
+         }
+         .display span.down::after{
+		     content:'\25BC';
+             color:red;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="display" data-rate='0'>
+         <span></span>
+      </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script type="text/javascript">
+         var refreshDisplay = function(loop){
+             $.ajax({
+                url: "https://blockchain.info/en/ticker", 
+                dataType: 'json',
+                cache: false,
+                data:{
+                	'uniq_param' : (new Date()).getTime()
+                },
+                success: function(result){                
+                	var rate = parseFloat(0.5 / result.USD.last).toFixed(11);
+                    if (rate != $("div.display > span").data('rate')){
+                        $("div.display > span").fadeOut(100, function(){
+                            $("div.display > span").removeClass("up down");
+                            if (rate > $("div.display > span").data('rate')){
+                                $("div.display > span").addClass("up");
+                            } else {
+                                $("div.display > span").addClass("down");
+                            }
+                            $("div.display > span").data('rate', rate).text(rate + ' BTC').fadeIn(100);
+                        });
+                    }
+                    
+                    if (loop){
+                        setTimeout(function(){
+                            refreshDisplay(true);
+                        }, 1000);
+                    }
+                }
+             });
+         }
+         $(document).ready(function(){  
+           $(".display").on('click', function(){
+               refreshDisplay();
+               return false;
+           });
+           refreshDisplay(true);
+         });
+      </script>
+   </body>
+</html>
